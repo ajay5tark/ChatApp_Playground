@@ -6,12 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flask Auth Example</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/kre4t3.css') }}">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
 </head>
 
 <body>
-    <section class="hero is-info is-fullheight">
-
+    <section class="hero is-info is-fullheight height100">
         <div class="hero-head">
             <nav class="navbar">
                 <div class="container">
@@ -41,13 +42,17 @@
                 </div>
             </nav>
         </div>
-        <div class="hero-body" style="height: 90%">
-            <div class="container has-text-centered">
-               {% block content %}
-               {% endblock %}
-            </div>
+        <div class="hero-body height90">
+            {% block content %}
+            {% endblock content %}
+        </div>
+        <div class="hero-foot padding-5" style="padding: 15px">
+            {% block footer %}
+            {% endblock footer %}
         </div>
     </section>
+    {% block scriptFiles %}
+    {% endblock scriptFiles %}
 </body>
 
 </html>

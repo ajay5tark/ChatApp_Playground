@@ -1,24 +1,42 @@
 from flask import Flask, request, render_template
 import os
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_socketio import SocketIO
+from flask_login import LoginManager, current_user
+from flask_socketio import SocketIO, disconnect
 import config
-
+import functools
 app = Flask(__name__)
 app.config.from_object(config.DevelopmentConfig)
-#app.config['SECRET_KEY'] = os.urandom(24)
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:password@localhost:5432/chatapp'
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
 socketio = SocketIO(app)
-import models
 
+import models
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
+
+def authenticated_only(f):
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        if not current_user.is_authenticated:
+            disconnect()
+        else:
+            return f(*args, **kwargs)
+    return wrapped
+
+@socketio.on('sendMessage')
+@authenticated_only
+def handle_message(message):
+    new_msg = models.Message(message['data'],current_user.id,1)
+    db.session.add(new_msg)
+    db.session.commit()
+    print(new_msg)
+
+@socketio.on('my event')
+def handle_event(json):
+    print("recieved json: " + str(json))
 
 @login_manager.user_loader
 def load_user(user_id):

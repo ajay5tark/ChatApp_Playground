@@ -1,7 +1,48 @@
 {% extends "base1.html" %}
 
 {% block content %}
-<h1 class="title">
-  Welcome to the lobby!
-</h1>
-{% endblock %}
+    <div class="container has-text-centered height100" style="max-height: 95%">
+      <h1 class="title">Team Kre4t3 - LOBBY</h1>
+      <div class="container content makeScrollable" id="msgArea">
+        {% for message in Messages %}
+            <p>{{ message.content }} - {{ message.author.name }}</p>
+        {% endfor %}
+      </div>
+    </div>
+{% endblock content %}
+
+{% block footer %}
+  <div class="container padding-5">
+    <div class="field has-addons">
+      <div class="control is-expanded">
+        <input class="input" type="text" placeholder="Type Your Message" id="chatMsg">
+      </div>
+      <div class="control">
+        <button class="button is-black" id="sendMessageButton">
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
+{% endblock footer %}
+
+{% block scriptFiles %}
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    $('button#sendMessageButton').on('click', function(e) {
+      e.preventDefault()
+      textMsg = $('input#chatMsg').val()
+      $('input#chatMsg').val("")
+      if (textMsg == "") return ;
+      else {
+        console.log(textMsg)
+        socket.emit('sendMessage', {data: textMsg})
+      }
+    })
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+
+</script>
+{% endblock scriptFiles %}
